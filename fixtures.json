@@ -1,0 +1,26 @@
+[
+{
+  "model": "catalog.category",
+  "pk": 1,
+  "fields": {
+    "name": "Category 1",
+    "description": "Нет описания"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 2,
+  "fields": {
+    "name": "Category 2",
+    "description": "Нет описания"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 3,
+  "fields": {
+    "name": "Category 3",
+    "description": "Нет описания"
+  }
+}
+]
