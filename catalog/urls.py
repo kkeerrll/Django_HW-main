@@ -23,4 +23,8 @@ urlpatterns = [
     path('articles/', ArticleListView.as_view(), name='article-list'),
     path('article/create/', ArticleCreateView.as_view(), name='article-create'),
     path('article/edit/<slug:slug>/', ArticleEditView.as_view(), name='article-edit'),
+    path('products/', views.product_list, name='product_list'),
+    path('versions/create/', views.create_version, name='create_version'),
+
+
 ]

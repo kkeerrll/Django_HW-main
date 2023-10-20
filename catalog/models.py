@@ -47,3 +47,9 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+class Version(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    version_number = models.PositiveIntegerField()
+    version_name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=False)

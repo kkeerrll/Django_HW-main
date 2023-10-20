@@ -2,7 +2,15 @@ from django.views import View
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Article, Product
 from django.utils.text import slugify
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import BlogPost
+from django.shortcuts import render
+from .models import Product
 
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'product_list.html', {'products': products})
 
 
 class HomeView(View):
@@ -32,9 +40,6 @@ class UpdateProductView(View):
         # Логика обновления товара
         return redirect('product-list')
 
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-from .models import BlogPost
 
 class BlogPostListView(ListView):
     model = BlogPost
