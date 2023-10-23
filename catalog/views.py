@@ -7,6 +7,8 @@ from django.urls import reverse_lazy
 from .models import BlogPost
 from django.shortcuts import render
 from .models import Product
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 def product_list(request):
     products = Product.objects.all()
@@ -17,6 +19,26 @@ class HomeView(View):
     def get(self, request):
         # Логика и код представления
         return render(request, 'home.html')
+
+class ProductListView(LoginRequiredMixin, ListView):
+    model = Product
+    # Переопределение метода get_queryset, чтобы отображать только продукты текущего пользователя
+    def get_queryset(self):
+        return Product.objects.filter(user=self.request.user)
+
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    model = Product
+    fields = ['name']
+    # Переопределение метода form_valid, чтобы автоматически привязать продукт к пользователю
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+class ProductDetailView(LoginRequiredMixin, DetailView):
+    model = Product
+    # Переопределение метода get_queryset, чтобы отображать только продукты текущего пользователя
+    def get_queryset(self):
+        return Product.objects.filter(user=self.request.user)
 
 
 class CreateProductView(View):

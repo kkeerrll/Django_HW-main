@@ -11,6 +11,8 @@ from .views import (
     ArticleCreateView,
     ArticleEditView,
 )
+from .views import ProductListView, ProductCreateView, ProductDetailView
+
 
 urlpatterns = [
     path('products/<int:product_id>/', views.show_product, name='show_product'),
@@ -25,6 +27,10 @@ urlpatterns = [
     path('article/edit/<slug:slug>/', ArticleEditView.as_view(), name='article-edit'),
     path('products/', views.product_list, name='product_list'),
     path('versions/create/', views.create_version, name='create_version'),
+    path('', ProductListView.as_view(), name='product-list'),
+    path('create/', ProductCreateView.as_view(), name='product-create'),
+    path('<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
+
 
 
 ]
