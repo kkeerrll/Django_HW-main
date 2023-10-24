@@ -1,6 +1,15 @@
 # Create your models here.
 from django.contrib.auth.models import User
 from django.db import models
+from django.contrib.auth.models import Group, Permission
+
+class ModeratorGroup(Group):
+    pass
+
+class Meta:
+    proxy = True
+    verbose_name = 'Группа модераторов'
+    verbose_name_plural = 'Группы модераторов'
 
 
 
@@ -21,6 +30,8 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Дата создания будет автоматически заполняться при создании объекта
     updated_at = models.DateTimeField(auto_now=True)  # Дата последнего изменения будет автоматически обновляться при сохранении объекта
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_published = models.BooleanField(default=False)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

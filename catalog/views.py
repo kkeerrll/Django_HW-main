@@ -8,6 +8,8 @@ from .models import BlogPost
 from django.shortcuts import render
 from .models import Product
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, get_object_or_404
+
 
 
 def product_list(request):
@@ -52,15 +54,30 @@ class CreateProductView(View):
 
 
 class UpdateProductView(View):
-    def get(self, request, product_id):
-        product = Product.objects.get(id=product_id)
-        # Логика рендеринга формы обновления товара
-        return render(request, 'update_product.html', {'product': product})
 
-    def post(self, request, product_id):
-        product = Product.objects.get(id=product_id)
-        # Логика обновления товара
-        return redirect('product-list')
+    def edit_product(request, product_id):
+        product = get_object_or_404(Product, pk=product_id)
+
+        # Проверка, является ли текущий пользователь владельцем продукта
+        if request.user != product.owner:
+            return HttpResponseForbidden("Вы не являетесь владельцем этого продукта")
+
+        if request.method == 'POST':
+            # Обработка формы редактирования продукта
+            def post(self, request, product_id):
+                product = Product.objects.get(id=product_id)
+                # Логика обновления товара
+                return redirect('product-list')
+
+        else:
+            # Отображение формы редактирования
+            def get(self, request, product_id):
+                product = Product.objects.get(id=product_id)
+                # Логика рендеринга формы обновления товара
+                return render(request, 'update_product.html', {'product': product})
+
+
+
 
 
 class BlogPostListView(ListView):
