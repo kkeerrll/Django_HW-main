@@ -29,9 +29,9 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)  # Дата создания будет автоматически заполняться при создании объекта
     updated_at = models.DateTimeField(auto_now=True)  # Дата последнего изменения будет автоматически обновляться при сохранении объекта
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    # owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

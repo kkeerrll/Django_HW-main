@@ -1,14 +1,14 @@
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
-from .views import register, email_verification, login, password_reset
+from userapp.views import RegisterView, ProfileView, EmailVerificationView, PasswordRecoveryView
 
-
-app_name = 'userapp'
+app_name = 'users'
 
 urlpatterns = [
-    path('register/', register, name='register'),
-    path('email_verification/', email_verification, name='email_verification'),
-    path('login/', login, name='login'),
-    path('password_reset/', password_reset, name='password_reset'),
-
+    path('', LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('password_recovery/', PasswordRecoveryView.as_view(), name='password_recovery'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('profile/', ProfileView.as_view(), name='profile'),
+    path('verify/<str:email>/<uuid:code>/', EmailVerificationView.as_view(), name='email_verification'),
 ]
-

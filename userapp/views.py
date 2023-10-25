@@ -1,47 +1,66 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from .forms import UserCreationForm, EmailVerificationForm, PasswordResetForm
+from django.conf import settings
+from django.core.mail import send_mail
+from django.shortcuts import HttpResponseRedirect
+from django.urls import reverse_lazy, reverse
+from django.utils.crypto import get_random_string
+from django.views.generic import CreateView, UpdateView, TemplateView
+from django.views.generic.edit import FormView
 
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            user.is_active = False
+from userapp.forms import UserRegisterForm, UserProfileForm, PasswordRecoveryForm
+from userapp.models import User, EmailVerification
+
+
+class RegisterView(CreateView):
+    model = User
+    form_class = UserRegisterForm
+    template_name = 'users/register.html'
+    success_url = reverse_lazy("users:login")
+
+
+class ProfileView(UpdateView):
+    model = User
+    form_class = UserProfileForm
+    success_url = reverse_lazy("users:profile")
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+
+class EmailVerificationView(TemplateView):
+    template_name = 'users/email_verification.html'
+
+    def get(self, request, *args, **kwargs):
+        code = kwargs['code']
+        user = User.objects.get(email=kwargs['email'])
+        email_verifications = EmailVerification.objects.filter(user=user, code=code)
+        if email_verifications.exists() and not email_verifications.first().is_expired():
+            user.is_active = True
             user.save()
-            return redirect('email_verification')
-    else:
-        form = UserCreationForm()
-    return render(request, 'register.html', {'form': form})
-
-def email_verification(request):
-    if request.method == 'POST':
-        form = EmailVerificationForm(request.POST)
-        if form.is_valid():
-            # Ваш код отправки письма с верификацией почты
-            return redirect('login')
-    else:
-        form = EmailVerificationForm()
-    return render(request, 'email_verification.html', {'form': form})
-
-def login(request):
-    if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
+            return super(EmailVerificationView, self).get(request, *args, **kwargs)
         else:
-            return redirect('login')
-    return render(request, 'login.html')
+            return HttpResponseRedirect(reverse('/'))
 
-def password_reset(request):
-    if request.method == 'POST':
-        form = PasswordResetForm(request.POST)
-        if form.is_valid():
-            # Ваш код восстановления пароля пользователя
-            return redirect('password_reset_done')
-    else:
-        form = PasswordResetForm()
-    return render(request, 'password_reset.html', {'form': form})
+
+class PasswordRecoveryView(FormView):
+    template_name = 'users/password_recovery.html'
+    form_class = PasswordRecoveryForm
+    success_url = reverse_lazy('users:login')
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email']
+        user = User.objects.get(email=email)
+        length = 12
+        alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        password = get_random_string(length, alphabet)
+        user.set_password(password)
+        user.save()
+        subject = 'Password Recovery'
+        message = f'Your new password: {password}'
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        return super().form_valid(form)
