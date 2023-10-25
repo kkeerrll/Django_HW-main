@@ -170,3 +170,25 @@ EMAIL_HOST_USER = 'kkeerrll137@gmail.com'
 EMAIL_HOST_PASSWORD = 'lika2244'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+load_dotenv()
+
+# Добавьте переменные окружения
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', '3600'))
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/0',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+
+
+

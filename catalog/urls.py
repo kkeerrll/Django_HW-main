@@ -1,4 +1,6 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
+
 from . import views
 from .views import (
     BlogPostListView,
@@ -13,6 +15,8 @@ from .views import (
 )
 from .views import ProductListView, ProductCreateView, ProductDetailView
 from userapp.views import register
+
+
 
 
 urlpatterns = [
@@ -32,6 +36,8 @@ urlpatterns = [
     path('create/', ProductCreateView.as_view(), name='product-create'),
     path('<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
     path('register/', register, name='register'),
+    path('product-detail/<int:pk>/', cache_page(3600)(ProductDetailView.as_view()), name='product-detail'),
+
 
 
 

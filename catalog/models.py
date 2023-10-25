@@ -2,6 +2,27 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.contrib.auth.models import Group, Permission
+from django.core.cache import cache
+from django.db import models
+
+
+class MyModel(models.Model):
+    # поля модели
+
+    def get_cached_data(self):
+        # Пробуем получить данные из кеша
+        data = cache.get(f'my_key_{self.id}')
+
+        # Если данные найдены в кеше, возвращаем их
+        if data:
+            return data
+
+        # Если данных нет в кеше, выполняем логику обработки и сохраняем результат в кеш
+        data = expensive_operation()
+        cache.set(f'my_key_{self.id}', data, timeout=3600)  # Сохраняем данные в кеш на 1 час
+
+        return data
+
 
 class ModeratorGroup(Group):
     pass

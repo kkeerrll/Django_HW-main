@@ -5,11 +5,27 @@ from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import BlogPost
-from django.shortcuts import render
 from .models import Product
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 
+from django.core.cache import cache
+
+
+
+def my_view(request):
+    # Пробуем получить данные из кеша
+    data = cache.get('my_key')
+
+    # Если данные найдены в кеше, возвращаем их
+    if data:
+        return render(request, 'my_template.html', {'data': data})
+
+    # Если данных нет в кеше, выполняем логику обработки и сохраняем результат в кеш
+    data = expensive_operation()
+    cache.set('my_key', data, timeout=3600)  # Сохраняем данные в кеш на 1 час
+
+    return render(request, 'my_template.html', {'data': data})
 
 
 def product_list(request):
